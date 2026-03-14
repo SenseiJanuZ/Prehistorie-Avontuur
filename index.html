@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Prehistorie Avontuur</title>
+<meta name="description" content="Leer over de prehistorie met dit leuke quizspel! Kies je dier, beantwoord vragen en verzamel beloningen.">
+<meta name="theme-color" content="#1a1a3e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prehistorie">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Prehistorie%20Avontuur%22%2C%22short_name%22%3A%22Prehistorie%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231a1a3e%22%2C%22theme_color%22%3A%22%231a1a3e%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%94%A5%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
+<!-- Non-blocking font loading with preconnect -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap"></noscript>
+
+<style>
+  :root {
+    --sky-top: #1a1a3e;
+    --sky-bottom: #4a3f6b;
+    --grass: #3d6b35;
+    --grass-light: #5a9e4b;
+    --earth: #8B6914;
+    --earth-dark: #6b4f10;
+    --fire-orange: #ff6b2b;
+    --fire-yellow: #ffd93d;
+    --bone: #f5e6c8;
+    --parchment: #fff8ee;
+    --wood: #a0744e;
+    --accent-horse: #c97b3a;
+    --accent-dog: #d4a056;
+    --correct: #4caf50;
+    --wrong: #e74c3c;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+    background: var(--sky-top);
+    overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: #2c1810;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
+  }
+
+  /* Screen reader only */
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0,0,0,0); border: 0;
+    white-space: nowrap;
+  }
+
+  /* Focus visible for keyboard nav */
+  :focus-visible {
+    outline: 3px solid var(--fire-orange);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .star {
+    position: absolute; background: white; border-radius: 50%;
+    animation: twinkle 3s infinite alternate;
+    will-change: opacity, transform;
+  }
+  @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+
+  .screen { display: none; position: relative; z-index: 1; min-height: 100vh; min-height: 100dvh; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  #title-screen {
+    justify-content: center; text-align: center; padding: 20px;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 40%, var(--grass) 70%, var(--earth-dark) 100%);
+  }
+
+  .title-cave {
+    position: relative;
+    background: radial-gradient(ellipse at 50% 60%, #3a2a1a 0%, #1a0f05 80%);
+    border-radius: 50% 50% 10% 10%;
+    padding: 40px 50px 30px; margin-bottom: 30px;
+    box-shadow: 0 0 60px rgba(255,107,43,0.3), inset 0 0 40px rgba(0,0,0,0.5);
+    max-width: 500px; width: 90%;
+  }
+  .title-cave h1 {
+    font-family: 'Fredoka', 'Segoe UI', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: var(--fire-yellow);
+    text-shadow: 0 0 20px rgba(255,107,43,0.8), 0 2px 4px rgba(0,0,0,0.5);
+    line-height: 1.2; letter-spacing: 2px;
+  }
+  .title-cave .subtitle {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    color: var(--bone); margin-top: 10px; opacity: 0.9;
+  }
+
+  .campfire { position: relative; width: 80px; height: 80px; margin: 0 auto 20px; }
+  .flame {
+    position: absolute; bottom: 10px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: flicker 0.5s infinite alternate;
+    will-change: transform;
+  }
+  .flame.f1 { width: 30px; height: 50px; left: 25px; background: var(--fire-yellow); }
+  .flame.f2 { width: 24px; height: 40px; left: 20px; background: var(--fire-orange); animation-delay: 0.1s; }
+  .flame.f3 { width: 24px; height: 40px; left: 36px; background: var(--fire-orange); animation-delay: 0.2s; }
+  .logs { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 15px; background: var(--wood); border-radius: 4px; box-shadow: 0 4px 0 var(--earth-dark); }
+  @keyframes flicker { 0% { transform: scaleY(1) scaleX(1) translateY(0); } 50% { transform: scaleY(1.1) scaleX(0.9) translateY(-3px); } 100% { transform: scaleY(0.95) scaleX(1.05) translateY(-1px); } }
+
+  .level-select { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .level-card {
+    background: rgba(255,248,238,0.12); border: 3px solid rgba(245,230,200,0.25); border-radius: 18px;
+    padding: 14px 18px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center; width: 130px; backdrop-filter: blur(6px);
+    -webkit-tap-highlight-color: transparent;
+    min-height: 48px;
+  }
+  .level-card:hover, .level-card:focus-visible { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+  .level-card[aria-pressed="true"] { border-color: var(--fire-orange); box-shadow: 0 6px 20px rgba(255,107,43,0.4); background: rgba(255,107,43,0.15); }
+  .level-icon { font-size: 2rem; display: block; margin-bottom: 4px; }
+  .level-name { font-family: 'Fredoka', sans-serif; font-size: 1rem; font-weight: 600; color: var(--fire-yellow); display: block; }
+  .level-desc { font-family: 'Quicksand', sans-serif; font-size: 0.75rem; color: var(--bone); margin-top: 3px; display: block; line-height: 1.3; }
+
+  .pet-select { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .pet-card {
+    background: var(--parchment); border: 3px solid transparent; border-radius: 16px; padding: 15px 20px;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); text-align: center; width: 130px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 48px;
+  }
+  .pet-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+  .pet-card.horse::before { background: var(--accent-horse); }
+  .pet-card.dog::before { background: var(--accent-dog); }
+  .pet-card.rabbit::before { background: #e88fa0; }
+  .pet-card:hover, .pet-card:focus-visible { transform: translateY(-8px) scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+  .pet-card[aria-pressed="true"] { border-color: var(--fire-orange); transform: translateY(-5px); box-shadow: 0 6px 20px rgba(255,107,43,0.4); }
+  .pet-emoji { font-size: 2.8rem; display: block; margin-bottom: 6px; }
+  .pet-name { font-family: 'Fredoka', sans-serif; font-size: 1.1rem; font-weight: 600; color: #3a2a1a; }
+  .pet-type { font-size: 0.7rem; color: #5a4a3a; margin-top: 2px; }
+
+  .btn-start {
+    font-family: 'Fredoka', sans-serif; font-size: 1.3rem;
+    background: linear-gradient(135deg, var(--fire-orange), #ff8f4f); color: white; border: none;
+    padding: 14px 50px; border-radius: 50px; cursor: pointer; margin-top: 30px;
+    box-shadow: 0 4px 20px rgba(255,107,43,0.5); transition: all 0.3s; letter-spacing: 1px;
+    min-height: 48px;
+  }
+  .btn-start:hover:not(:disabled), .btn-start:focus-visible:not(:disabled) { transform: scale(1.08); box-shadow: 0 6px 30px rgba(255,107,43,0.7); }
+  .btn-start:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  #game-screen { background: linear-gradient(180deg, #87CEEB 0%, #b8e6ff 30%, var(--grass-light) 65%, var(--grass) 70%, var(--earth) 100%); padding: 15px; }
+  #game-screen.level2-bg { background: linear-gradient(180deg, #5a4a8a 0%, #7a6aaa 30%, #6b8b5e 65%, #4a6b3a 70%, #5a4a20 100%); }
+  #game-screen.level3-bg { background: linear-gradient(180deg, #2a1a3e 0%, #4a2a6a 30%, #3a5a3a 65%, #2a4a2a 70%, #1a2a10 100%); }
+
+  .game-hud {
+    display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 600px;
+    padding: 10px 20px; background: rgba(255,255,255,0.9); border-radius: 20px; margin-bottom: 15px;
+    backdrop-filter: blur(10px); box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  }
+  .hud-level-badge { font-family: 'Fredoka', sans-serif; font-size: 0.7rem; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+  .hud-level-badge.l1 { background: #e8f5e9; color: #2e7d32; }
+  .hud-level-badge.l2 { background: #fce4ec; color: #c62828; }
+  .hud-level-badge.l3 { background: #ede7f6; color: #4a148c; }
+  .hud-bones { font-family: 'Fredoka', sans-serif; font-size: 1.1rem; color: var(--earth-dark); display: flex; align-items: center; gap: 6px; }
+  .hud-progress { display: flex; gap: 6px; align-items: center; }
+  .progress-dot { width: 14px; height: 14px; border-radius: 50%; background: #ddd; transition: all 0.4s; border: 2px solid #ccc; }
+  .progress-dot.correct { background: var(--correct); border-color: #388e3c; box-shadow: 0 0 8px rgba(76,175,80,0.5); }
+  .progress-dot.wrong { background: var(--wrong); border-color: #c62828; }
+  .progress-dot.current { border-color: var(--fire-orange); background: var(--fire-yellow); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+  .hud-lives { display: flex; gap: 3px; font-size: 1.2rem; }
+
+  .question-area {
+    background: var(--parchment); border-radius: 24px; padding: 25px 30px; max-width: 600px; width: 100%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15); border: 3px solid var(--bone);
+  }
+  .companion { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  .companion-avatar { font-size: 2.5rem; background: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.1); flex-shrink: 0; }
+  .companion-bubble { background: white; border-radius: 18px 18px 18px 4px; padding: 12px 18px; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; color: #5a4a3a; box-shadow: 0 2px 8px rgba(0,0,0,0.08); line-height: 1.4; }
+  .question-text { font-family: 'Fredoka', sans-serif; font-size: clamp(1.1rem, 3vw, 1.35rem); color: #2c1810; margin-bottom: 20px; line-height: 1.5; text-align: center; }
+
+  .answers { display: flex; flex-direction: column; gap: 10px; }
+  .answer-btn {
+    font-family: 'Quicksand', sans-serif; font-size: 1rem; font-weight: 600; background: white;
+    border: 2px solid #e0d5c5; border-radius: 14px; padding: 14px 20px; cursor: pointer;
+    transition: all 0.25s; text-align: left; color: #3a2a1a; min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .answer-btn:hover:not(.locked), .answer-btn:focus-visible:not(.locked) { border-color: var(--fire-orange); background: #fff5ee; transform: translateX(5px); }
+  .answer-btn.correct-answer { border-color: var(--correct); background: #e8f5e9; color: #2e7d32; animation: correctPop 0.4s; }
+  .answer-btn.wrong-answer { border-color: var(--wrong); background: #ffebee; color: #c62828; animation: shake 0.4s; }
+  .answer-btn.locked { pointer-events: none; opacity: 0.7; }
+  .answer-btn.reveal-correct { border-color: var(--correct); background: #e8f5e9; opacity: 1 !important; }
+  @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+  .tf-buttons { display: flex; gap: 15px; justify-content: center; }
+  .tf-btn {
+    font-family: 'Fredoka', sans-serif; font-size: 1.2rem; font-weight: 600;
+    padding: 16px 40px; border-radius: 16px; cursor: pointer; transition: all 0.25s;
+    border: 3px solid; min-width: 140px; text-align: center; min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tf-btn.tf-true { background: #e8f5e9; border-color: #a5d6a7; color: #2e7d32; }
+  .tf-btn.tf-false { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
+  .tf-btn:hover:not(.locked), .tf-btn:focus-visible:not(.locked) { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+  .tf-btn.correct-answer { border-color: var(--correct); box-shadow: 0 0 15px rgba(76,175,80,0.4); animation: correctPop 0.4s; }
+  .tf-btn.wrong-answer { border-color: var(--wrong); box-shadow: 0 0 15px rgba(231,76,60,0.4); animation: shake 0.4s; }
+  .tf-btn.locked { pointer-events: none; opacity: 0.6; }
+  .tf-btn.reveal-correct { border-color: var(--correct); opacity: 1 !important; box-shadow: 0 0 12px rgba(76,175,80,0.3); }
+
+  .multi-hint { font-family: 'Fredoka', sans-serif; font-size: 0.85rem; color: #8a7a6a; text-align: center; margin-bottom: 12px; }
+  .multi-btn {
+    font-family: 'Quicksand', sans-serif; font-size: 1rem; font-weight: 600; background: white;
+    border: 2px solid #e0d5c5; border-radius: 14px; padding: 14px 20px 14px 20px; cursor: pointer;
+    transition: all 0.25s; text-align: left; color: #3a2a1a; position: relative; min-height: 48px;
+    padding-right: 45px; -webkit-tap-highlight-color: transparent;
+  }
+  .multi-btn:hover:not(.locked), .multi-btn:focus-visible:not(.locked) { border-color: var(--fire-orange); background: #fff5ee; }
+  .multi-btn[aria-checked="true"] { border-color: var(--fire-orange); background: #fff5ee; }
+  .multi-btn[aria-checked="true"]::after { content: '✓'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--fire-orange); font-weight: 700; }
+  .multi-btn.correct-answer { border-color: var(--correct); background: #e8f5e9; color: #2e7d32; }
+  .multi-btn.correct-answer::after { content: '✓'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--correct); font-size: 1.2rem; font-weight: 700; }
+  .multi-btn.wrong-answer { border-color: var(--wrong); background: #ffebee; color: #c62828; }
+  .multi-btn.wrong-answer::after { content: '✗'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--wrong); font-size: 1.2rem; font-weight: 700; }
+  .multi-btn.missed-correct { border-color: var(--correct); background: #e8f5e9; opacity: 0.8; }
+  .multi-btn.missed-correct::after { content: '✓'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--correct); font-size: 1.2rem; font-weight: 700; }
+  .multi-btn.locked { pointer-events: none; }
+
+  .btn-check {
+    font-family: 'Fredoka', sans-serif; font-size: 1rem;
+    background: linear-gradient(135deg, var(--fire-orange), #ff8f4f); color: white; border: none;
+    padding: 10px 30px; border-radius: 30px; cursor: pointer; margin-top: 15px;
+    box-shadow: 0 3px 12px rgba(255,107,43,0.4); transition: all 0.2s;
+    display: block; margin-left: auto; margin-right: auto; min-height: 44px;
+  }
+  .btn-check:hover, .btn-check:focus-visible { transform: scale(1.05); }
+
+  .q-type { display: inline-block; font-family: 'Fredoka', sans-serif; font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px; }
+  .q-type.kennis { background: #e3f2fd; color: #1565c0; }
+  .q-type.begrip { background: #f3e5f5; color: #7b1fa2; }
+  .q-type.slepen { background: #fff3e0; color: #e65100; }
+  .q-type.denk { background: #fce4ec; color: #c62828; }
+  .q-type.waarniet { background: #e0f7fa; color: #00695c; }
+  .q-type.multi { background: #ede7f6; color: #4a148c; }
+
+  .drag-zone { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; min-height: 50px; background: #f5f0e8; border-radius: 12px; margin-bottom: 15px; border: 2px dashed #d0c5b5; }
+  .drag-item {
+    font-family: 'Fredoka', sans-serif; font-size: 0.9rem; padding: 8px 16px; background: white;
+    border: 2px solid #d0c5b5; border-radius: 10px; cursor: grab; transition: all 0.2s;
+    user-select: none; touch-action: none; min-height: 40px;
+    display: inline-flex; align-items: center;
+  }
+  .drag-item:active { cursor: grabbing; transform: scale(1.1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .drag-item.placed { opacity: 0.4; pointer-events: none; }
+  .drag-item.selected-item { border-color: var(--fire-orange); background: #fff5ee; box-shadow: 0 0 8px rgba(255,107,43,0.3); }
+  .drag-item:focus-visible { outline: 3px solid var(--fire-orange); }
+
+  .drop-targets { display: flex; flex-direction: column; gap: 10px; }
+  .drop-row { display: flex; align-items: center; gap: 10px; }
+  .drop-label { font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5a4a3a; min-width: 100px; text-align: right; }
+  .drop-target { flex: 1; min-height: 44px; background: white; border: 2px dashed #c0b5a5; border-radius: 10px; display: flex; align-items: center; padding: 4px 10px; transition: all 0.2s; }
+  .drop-target.hover { border-color: var(--fire-orange); background: #fff5ee; }
+  .drop-target .drag-item { cursor: pointer; }
+  .drop-target.correct-drop { border-color: var(--correct); background: #e8f5e9; border-style: solid; }
+  .drop-target.wrong-drop { border-color: var(--wrong); background: #ffebee; border-style: solid; }
+
+  .btn-next {
+    font-family: 'Fredoka', sans-serif; font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--fire-orange), #ff8f4f); color: white; border: none;
+    padding: 12px 40px; border-radius: 30px; cursor: pointer; margin-top: 20px;
+    box-shadow: 0 3px 15px rgba(255,107,43,0.4); transition: all 0.3s; display: none; min-height: 48px;
+  }
+  .btn-next:hover, .btn-next:focus-visible { transform: scale(1.05); }
+
+  .feedback-float {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+    font-family: 'Fredoka', sans-serif; font-size: 2rem; padding: 20px 40px; border-radius: 20px;
+    color: white; z-index: 100; pointer-events: none; animation: feedbackPop 1.2s forwards;
+    will-change: transform, opacity;
+  }
+  .feedback-float.good { background: var(--correct); }
+  .feedback-float.bad { background: var(--wrong); }
+  @keyframes feedbackPop { 0% { transform: translate(-50%,-50%) scale(0); opacity: 0; } 20% { transform: translate(-50%,-50%) scale(1.1); opacity: 1; } 80% { transform: translate(-50%,-50%) scale(1); opacity: 1; } 100% { transform: translate(-50%,-60%) scale(0.8); opacity: 0; } }
+
+  .item-collect { position: fixed; font-size: 2rem; z-index: 100; pointer-events: none; animation: itemFloat 1s forwards; will-change: transform, opacity; }
+  @keyframes itemFloat { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.5); } }
+
+  #result-screen { background: linear-gradient(180deg, #1a1a3e 0%, #2a2a5e 30%, var(--grass) 70%, var(--earth-dark) 100%); justify-content: center; text-align: center; padding: 20px; }
+  .result-card { background: var(--parchment); border-radius: 28px; padding: 35px 40px; max-width: 480px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+  .result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--fire-orange), var(--fire-yellow), var(--correct)); }
+  .result-title { font-family: 'Fredoka', sans-serif; font-size: 1.8rem; color: #2c1810; margin-bottom: 10px; }
+  .result-stars { font-size: 2.5rem; margin: 15px 0; }
+  .result-stars .star-empty { opacity: 0.2; }
+  .result-score { font-family: 'Fredoka', sans-serif; font-size: 1.2rem; color: #5a4a3a; margin-bottom: 5px; }
+  .result-items { font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--earth); margin-bottom: 20px; }
+  .result-pet-msg { background: white; border-radius: 16px; padding: 15px 20px; margin: 15px 0; font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5a4a3a; display: flex; align-items: center; gap: 12px; text-align: left; }
+  .result-pet-msg .pet-face { font-size: 2.2rem; flex-shrink: 0; }
+  .result-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 15px; }
+  .btn-restart {
+    font-family: 'Fredoka', sans-serif; font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--fire-orange), #ff8f4f); color: white; border: none;
+    padding: 12px 40px; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255,107,43,0.4); transition: all 0.3s; min-height: 48px;
+  }
+  .btn-restart:hover, .btn-restart:focus-visible { transform: scale(1.05); }
+  .btn-other-level {
+    font-family: 'Fredoka', sans-serif; font-size: 0.9rem; background: transparent;
+    color: #8a7a6a; border: 2px solid #d0c5b5; padding: 8px 25px; border-radius: 50px;
+    cursor: pointer; transition: all 0.3s; min-height: 44px;
+  }
+  .btn-other-level:hover, .btn-other-level:focus-visible { border-color: var(--fire-orange); color: var(--fire-orange); }
+
+  .confetti-piece { position: fixed; z-index: 200; pointer-events: none; animation: confettiFall linear forwards; will-change: transform, opacity; }
+  @keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
+
+  .ground-scene { width: 100%; max-width: 600px; height: 60px; position: relative; margin-bottom: 10px; overflow: hidden; }
+  .ground-grass { position: absolute; bottom: 0; left: 0; right: 0; height: 20px; background: repeating-linear-gradient(90deg, var(--grass-light) 0px, var(--grass) 10px, var(--grass-light) 20px); border-radius: 10px 10px 0 0; }
+  .walking-pet { position: absolute; bottom: 15px; font-size: 2rem; transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); }
+  .walking-pet.bounce { animation: petBounce 0.6s; }
+  @keyframes petBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+  .explanation { margin-top: 12px; padding: 12px 16px; background: #fff8e1; border-radius: 12px; border-left: 4px solid var(--fire-yellow); font-family: 'Quicksand', sans-serif; font-size: 0.9rem; color: #5a4a3a; line-height: 1.5; }
+  .explanation strong { color: #e65100; }
+
+  .section-label { color: var(--bone); font-family: 'Fredoka', sans-serif; font-size: 1.1rem; margin-bottom: 5px; margin-top: 15px; }
+
+  .how-to-play { max-width: 440px; width: 90%; margin: 20px auto; background: rgba(255,248,238,0.12); border: 2px solid rgba(245,230,200,0.25); border-radius: 18px; overflow: hidden; backdrop-filter: blur(6px); }
+  .htp-toggle { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 1.05rem; color: var(--fire-yellow); transition: background 0.2s; min-height: 48px; -webkit-tap-highlight-color: transparent; }
+  .htp-toggle:hover, .htp-toggle:focus-visible { background: rgba(255,255,255,0.06); }
+  .htp-arrow { transition: transform 0.3s; font-size: 0.85rem; }
+  .htp-arrow.open { transform: rotate(180deg); }
+  .htp-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; padding: 0 20px; }
+  .htp-content[aria-hidden="false"] { max-height: 400px; padding: 0 20px 16px; }
+  .htp-step { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; font-family: 'Quicksand', sans-serif; font-size: 0.92rem; color: var(--bone); line-height: 1.45; border-bottom: 1px solid rgba(245,230,200,0.1); }
+  .htp-step:last-child { border-bottom: none; }
+  .htp-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .htp-step strong { color: var(--fire-yellow); }
+
+  @media (max-width: 500px) {
+    .pet-card { width: 100px; padding: 10px 12px; }
+    .pet-emoji { font-size: 2rem; }
+    .question-area { padding: 18px; }
+    .drop-row { flex-direction: column; align-items: stretch; }
+    .drop-label { text-align: left; min-width: auto; }
+    .level-card { width: 105px; padding: 10px 12px; }
+    .tf-btn { padding: 14px 25px; min-width: 110px; font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="stars" id="stars" aria-hidden="true"></div>
+
+<!-- Live region for screen reader announcements -->
+<div id="sr-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<noscript>
+  <div style="background:#fff8ee;color:#2c1810;padding:40px;text-align:center;font-family:sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;">
+    <div><h1 style="font-size:2rem;margin-bottom:16px;">🔥 Prehistorie Avontuur</h1><p>Dit spel heeft JavaScript nodig om te werken. Schakel JavaScript in en herlaad de pagina.</p></div>
+  </div>
+</noscript>
+
+<main>
+<!-- TITLE SCREEN -->
+<section class="screen active" id="title-screen" role="region" aria-label="Startscherm">
+  <div class="campfire" aria-hidden="true"><div class="flame f1"></div><div class="flame f2"></div><div class="flame f3"></div><div class="logs"></div></div>
+  <header class="title-cave">
+    <h1>Prehistorie Avontuur</h1>
+    <p class="subtitle">Leren voor de toets — Les 1 &amp; 2</p>
+  </header>
+
+  <nav class="how-to-play" aria-label="Speluitleg">
+    <div class="htp-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="htp-content" id="htp-toggle">
+      <span>📜 Zo werkt het spel</span><span class="htp-arrow" id="htp-arrow">▼</span>
+    </div>
+    <div class="htp-content" id="htp-content" aria-hidden="true">
+      <div class="htp-step"><span class="htp-icon" aria-hidden="true">🐾</span><span><strong>Kies je maatje</strong> — Andor, Sep of Lente reist met je mee!</span></div>
+      <div class="htp-step"><span class="htp-icon" aria-hidden="true">❓</span><span><strong>10 vragen</strong> — Keuze, slepen, waar/niet-waar en meer!</span></div>
+      <div class="htp-step"><span class="htp-icon" aria-hidden="true">🍎</span><span><strong>Verzamel beloningen</strong> — Elk dier verzamelt iets anders!</span></div>
+      <div class="htp-step"><span class="htp-icon" aria-hidden="true">❤️</span><span><strong>3 levens</strong> — Bij fout verlies je er één.</span></div>
+      <div class="htp-step"><span class="htp-icon" aria-hidden="true">⭐</span><span><strong>Verdien sterren</strong> — Haal jij ze alle drie?</span></div>
+    </div>
+  </nav>
+
+  <h2 class="section-label" id="level-label">Kies je level:</h2>
+  <div class="level-select" role="radiogroup" aria-labelledby="level-label">
+    <div class="level-card" role="radio" tabindex="0" aria-pressed="false" aria-label="Level 1 — Basisvragen" data-level="1" id="card-level1"><span class="level-icon" aria-hidden="true">🌿</span><span class="level-name">Level 1</span><span class="level-desc">Basisvragen</span></div>
+    <div class="level-card" role="radio" tabindex="0" aria-pressed="false" aria-label="Level 2 — Denkvragen" data-level="2" id="card-level2"><span class="level-icon" aria-hidden="true">🔥</span><span class="level-name">Level 2</span><span class="level-desc">Denkvragen</span></div>
+    <div class="level-card" role="radio" tabindex="0" aria-pressed="false" aria-label="Level 3 — Expert" data-level="3" id="card-level3"><span class="level-icon" aria-hidden="true">🏆</span><span class="level-name">Level 3</span><span class="level-desc">Expert!</span></div>
+  </div>
+
+  <h2 class="section-label" id="pet-label">Kies je reisgenoot:</h2>
+  <div class="pet-select" role="radiogroup" aria-labelledby="pet-label">
+    <div class="pet-card horse" role="radio" tabindex="0" aria-pressed="false" aria-label="Andor het paard — verzamelt appels" data-pet="horse" id="card-horse"><span class="pet-emoji" aria-hidden="true">🐴</span><span class="pet-name">Andor</span><span class="pet-type">verzamelt 🍎</span></div>
+    <div class="pet-card dog" role="radio" tabindex="0" aria-pressed="false" aria-label="Sep de hond — verzamelt botten" data-pet="dog" id="card-dog"><span class="pet-emoji" aria-hidden="true">🐶</span><span class="pet-name">Sep</span><span class="pet-type">verzamelt 🦴</span></div>
+    <div class="pet-card rabbit" role="radio" tabindex="0" aria-pressed="false" aria-label="Lente het konijn — verzamelt wortels" data-pet="rabbit" id="card-rabbit"><span class="pet-emoji" aria-hidden="true">🐰</span><span class="pet-name">Lente</span><span class="pet-type">verzamelt 🥕</span></div>
+  </div>
+
+  <button class="btn-start" id="btn-start" disabled aria-disabled="true">Start het avontuur! 🔥</button>
+</section>
+
+<!-- GAME SCREEN -->
+<section class="screen" id="game-screen" role="region" aria-label="Spelscherm">
+  <div class="game-hud" role="status" aria-label="Spelinformatie">
+    <div class="hud-bones" id="hud-bones" aria-label="Score">🦴 0</div>
+    <div class="hud-progress" id="hud-progress" aria-label="Voortgang"></div>
+    <div class="hud-lives" id="hud-lives" aria-label="Levens"></div>
+  </div>
+  <div class="ground-scene" aria-hidden="true"><div class="walking-pet" id="walking-pet"></div><div class="ground-grass"></div></div>
+  <div class="question-area" id="question-area" role="region" aria-label="Vraag"></div>
+  <button class="btn-next" id="btn-next">Volgende vraag →</button>
+</section>
+
+<!-- RESULT SCREEN -->
+<section class="screen" id="result-screen" role="region" aria-label="Resultaat">
+  <div class="result-card" id="result-card"></div>
+</section>
+</main>
+
+<script>
+'use strict';
+
+// ===== UTILITY =====
+function esc(s){const d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML;}
+function announce(msg){const el=document.getElementById('sr-announce');el.textContent='';requestAnimationFrame(()=>{el.textContent=msg;});}
+function safeText(parent,text){parent.textContent='';parent.appendChild(document.createTextNode(text));}
+
+// ===== STARS =====
+(function(){const c=document.getElementById('stars');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';const z=Math.random()*3+1;s.style.cssText='width:'+z+'px;height:'+z+'px;top:'+Math.random()*50+'%;left:'+Math.random()*100+'%;animation-delay:'+Math.random()*3+'s;animation-duration:'+(2+Math.random()*3)+'s;';c.appendChild(s);}})();
+
+// Pause star animations when not on title screen
+function setStarsPaused(paused){
+  document.getElementById('stars').style.animationPlayState=paused?'paused':'running';
+  document.querySelectorAll('.star').forEach(function(s){s.style.animationPlayState=paused?'paused':'running';});
+}
+
+// ===== HOW TO PLAY =====
+(function(){
+  var toggle=document.getElementById('htp-toggle');
+  var content=document.getElementById('htp-content');
+  var arrow=document.getElementById('htp-arrow');
+  function flip(){
+    var open=content.getAttribute('aria-hidden')==='false';
+    content.setAttribute('aria-hidden', open?'true':'false');
+    toggle.setAttribute('aria-expanded', open?'false':'true');
+    arrow.classList.toggle('open',!open);
+  }
+  toggle.addEventListener('click',flip);
+  toggle.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();flip();}});
+})();
+
+// ===== PET DATA =====
+var pets={
+  horse:{name:'Andor',emoji:'🐴',item:'🍎',itemName:'appels',sound:'Hihi!',encourageGood:['Galopperend goed!','Andor is trots op je!','Hoef-tastic!','Andor steigert van blijdschap!'],encourageBad:['Niet erg, probeer de volgende!','Andor gelooft in je!','Dat was een lastige!']},
+  dog:{name:'Sep',emoji:'🐶',item:'🦴',itemName:'botten',sound:'Woef!',encourageGood:['Woef woef! Goed zo!','Sep kwispelt zijn staart eraf!','Pootje geven? Nee, high five!','Sep is zo blij!'],encourageBad:['Sep likt je troostend.','Volgende keer beter!','Sep geeft je een knuffel!']},
+  rabbit:{name:'Lente',emoji:'🐰',item:'🥕',itemName:'wortels',sound:'Huppeldepup!',encourageGood:['Hoppla! Super!','Lente springt een gat in de lucht!','Konijntastisch!','Lente doet een vreugde-sprongetje!'],encourageBad:['Lente knuffelt je.','Geeft niks, hop door!','Lente wiebelt bemoedigend met haar neus!']}
+};
+
+// ===== QUESTIONS =====
+// All questions have: explanation, plausible distractors, varied correct index
+var level1Questions=[
+  // correct indices: 1,2,0,3,2,0,1,2,3,0,2,3 — evenly distributed
+  {type:'mc',category:'kennis',q:'Wat waren mannen die op wilde dieren jaagden?',
+    options:['Verzamelaars','Jagers','Landbouwers','Natuurgoden'],correct:1,
+    explanation:'Mannen die op wilde dieren jaagden heetten jagers. Verzamelaars zochten planten en bessen.'},
+  {type:'mc',category:'kennis',q:'Wat zochten vrouwen en kinderen in de natuur?',
+    options:['Stenen gereedschap','Huiden van dieren','Eetbare dingen zoals bessen en noten','Hout voor hutten'],correct:2,
+    explanation:'Vrouwen en kinderen waren verzamelaars: ze zochten eetbare dingen zoals bessen, noten en wortels in de natuur.'},
+  {type:'mc',category:'begrip',q:'Waarom trokken mensen in de prehistorie van plek naar plek?',
+    options:['Omdat het eten opraakte en ze elders moesten zoeken','Omdat ze nieuwe schuilplekken wilden bouwen','Omdat ze andere groepen wilden ontmoeten','Omdat ze nieuwe gereedschappen zochten'],correct:0,
+    explanation:'Als het eten op een plek op was, trokken ze verder om ergens anders te jagen en te verzamelen.'},
+  {type:'mc',category:'kennis',q:'Welke ontdekking hielp mensen om eten klaar te maken en warm te blijven?',
+    options:['Het maken van stenen messen','Het bouwen van hutten','Het temmen van dieren','Het maken van vuur'],correct:3,
+    explanation:'Vuur was een hele belangrijke ontdekking. Mensen konden er eten mee koken en zich aan warmen.'},
+  {type:'mc',category:'begrip',q:'Waarom geloofden mensen in natuurgoden?',
+    options:['Omdat ze andere groepen dat zagen doen','Omdat ze dachten dat goden de regen en de zon bestuurden','Omdat ze in de natuur leefden en die niet begrepen','Omdat ze de sterren bestudeerden'],correct:2,
+    explanation:'Mensen leefden midden in de natuur maar begrepen niet hoe dingen als regen, zon en wind werkten. Ze dachten dat goden dat bestuurden.'},
+  {type:'mc',category:'kennis',q:'Waarom gingen jagers dieren levend vangen?',
+    options:['Zodat ze niet iedere dag op jacht hoefden','Omdat levende dieren makkelijker te dragen waren','Omdat ze de dieren wilden bestuderen','Omdat dode dieren snel bederven'],correct:0,
+    explanation:'Door dieren levend te vangen en te houden, hoefden ze niet meer elke dag gevaarlijk op jacht.'},
+  {type:'mc',category:'kennis',q:'Wat leverden tamme dieren op voor de mensen?',
+    options:['Huiden om tenten van te maken','Melk of wol','Stenen om gereedschap van te maken','Hout voor het vuur'],correct:1,
+    explanation:'Tamme dieren gaven nuttige dingen: sommige gaven melk en van andere kon je de wol gebruiken.'},
+  {type:'mc',category:'kennis',q:'Hoe heet het zaaien en verbouwen van gewassen?',
+    options:['Jagen','Verzamelen','Landbouw','Fokken'],correct:2,
+    explanation:'Het zaaien en verbouwen van graan en groente heet landbouw. Jagen is op dieren jagen, verzamelen is eetbare dingen zoeken in de natuur.'},
+  {type:'mc',category:'kennis',q:'Waar gebruikten mensen een maalsteen voor?',
+    options:['Om dierenhuiden zacht te maken','Om hout mee te bewerken','Om vlees mee te snijden','Om graankorrels tot meel te vermalen'],correct:3,
+    explanation:'Een maalsteen werd gebruikt om harde graankorrels fijn te malen tot meel. Van dat meel konden ze brood maken.'},
+  {type:'mc',category:'kennis',q:'Wat is een sikkel?',
+    options:['Een gebogen mes om graan mee te snijden','Een scherpe steen om hout mee te hakken','Een gereedschap om gaten mee te graven','Een stok om dieren mee te hoeden'],correct:0,
+    explanation:'Een sikkel is een mes in de vorm van een halvemaan. Het was speciaal gemaakt om graanstengels mee af te snijden.'},
+  {type:'mc',category:'kennis',q:'Wat is een spintol?',
+    options:['Een puntig stuk steen om mee te boren','Een houten stok om mee te graven','Een voorwerp om wol tot draad te spinnen','Een gereedschap om vuur mee te maken'],correct:2,
+    explanation:'Met een spintol kon je wol draaien tot draad. Van die draad kon je vervolgens stof weven voor kleren.'},
+  {type:'mc',category:'begrip',q:'Waarom gingen mensen op een vaste plek in hutten wonen?',
+    options:['Omdat ze moe waren van het rondtrekken','Omdat ze bang waren voor andere groepen','Omdat ze samen wilden wonen met andere families','Omdat ze vee en planten hadden om te verzorgen'],correct:3,
+    explanation:'Toen mensen dieren gingen houden en planten gingen kweken, moesten ze op dezelfde plek blijven om ervoor te zorgen. Daarom bouwden ze hutten.'},
+  {type:'drag',category:'slepen',q:'Sleep elk woord naar de juiste uitleg:',items:['Jager','Verzamelaar','Natuurgod','Landbouw'],targets:['Jaagt op wilde dieren','Zoekt eetbare dingen in de natuur','Iets in de natuur dat als god werd aanbeden','Zaaien en verbouwen van gewassen'],correctMap:{0:0,1:1,2:2,3:3}},
+  {type:'drag',category:'slepen',q:'Sleep elk gereedschap naar wat het doet:',items:['Maalsteen','Sikkel','Spintol'],targets:['Graankorrels tot meel vermalen','Graan afsnijden met een gebogen mes','Wol tot draad draaien'],correctMap:{0:0,1:1,2:2}}
+];
+
+var level2Questions=[
+  // correct indices: 2,0,3,1,0,2,3,1,0,2,1,3 — evenly distributed
+  {type:'mc',category:'denk',q:'Waarom werden "jagers" en "verzamelaars" samen genoemd?',
+    options:['Omdat iedereen beide taken deed','Omdat het twee namen waren voor hetzelfde','Omdat de mannen jaagden en de vrouwen verzamelden \u2014 ze werkten als team','Omdat verzamelen een vorm van jagen was'],correct:2,
+    explanation:'De taken werden verdeeld: mannen jaagden op dieren, vrouwen en kinderen verzamelden eetbare planten. Samen zorgden ze voor genoeg eten.'},
+  {type:'mc',category:'denk',q:'Wat veranderde er toen mensen landbouw ontdekten?',
+    options:['Ze konden op \u00e9\u00e9n plek blijven wonen','Ze gingen in grotere groepen jagen','Ze hoefden geen gereedschap meer te maken','Ze trokken juist sneller rond om zaden te zoeken'],correct:0,
+    explanation:'Door landbouw konden mensen hun eigen eten verbouwen. Ze hoefden niet meer rond te trekken en gingen op een vaste plek wonen.'},
+  {type:'mc',category:'denk',q:'Waarom was de ontdekking van vuur z\u00f3 belangrijk voor de mensen?',
+    options:['Omdat ze er hutten mee konden bouwen','Omdat ze er stenen gereedschap mee konden maken','Omdat ze er dieren mee konden lokken','Omdat het hielp bij koken, warmte, licht en bescherming'],correct:3,
+    explanation:'Vuur was heel veelzijdig: eten koken, warmte geven, licht maken in het donker, en het hield wilde dieren op afstand.'},
+  {type:'mc',category:'begrip',q:'Welke stap kwam eerst: dieren tam maken of landbouw?',
+    options:['Landbouw kwam eerst, daarna volgden de dieren','Dieren tam maken kwam eerst, landbouw kwam later','Ze begonnen precies tegelijk','Eerst kwam het bouwen van hutten'],correct:1,
+    explanation:'Jagers gingen eerst dieren levend vangen om ze te houden. Pas later ontdekten ze dat je ook zaden kon planten en oogsten.'},
+  {type:'mc',category:'denk',q:'Waarom dachten mensen dat dingen in de natuur goden waren?',
+    options:['Omdat ze de natuur niet begrepen en dachten dat iemand het bestuurde','Omdat ze andere groepen dat zagen geloven','Omdat ze droomden over de zon en de maan','Omdat ze tekens zagen in het weer'],correct:0,
+    explanation:'Mensen begrepen nog niet hoe de natuur werkte. Ze dachten dat krachtige dingen zoals de zon, regen en wind door goden werden bestuurd.'},
+  {type:'mc',category:'denk',q:'Jagers-verzamelaars kunnen op een plek geen eten meer vinden. Wat doen ze?',
+    options:['Ze gaan meer gereedschap maken','Ze gaan hutten bouwen om te blijven','Ze trekken verder naar een nieuwe plek met meer eten','Ze wachten tot er weer planten groeien'],correct:2,
+    explanation:'Jagers-verzamelaars leefden als nomaden. Als het eten op een plek op was, trokken ze verder naar een plek waar wel genoeg te vinden was.'},
+  {type:'mc',category:'begrip',q:'Wat is het verschil tussen een jager en een boer?',
+    options:['Een jager leeft alleen, een boer leeft in een groep','Een jager eet alleen vlees, een boer eet alleen planten','Een jager maakt gereedschap, een boer niet','Een jager vangt wilde dieren, een boer kweekt zijn eigen eten en dieren'],correct:3,
+    explanation:'Een jager jaagt op wilde dieren in de natuur. Een boer kweekt zelf planten (landbouw) en houdt tamme dieren \u2014 hij hoeft niet meer te jagen.'},
+  {type:'mc',category:'denk',q:'Waarom was de gebogen vorm van een sikkel handig?',
+    options:['Omdat het makkelijker in je hand lag','Omdat je er in \u00e9\u00e9n beweging door graanstengels kon snijden','Omdat het minder steen kostte om te maken','Omdat je het ook als lepel kon gebruiken'],correct:1,
+    explanation:'De gebogen halvemaanvorm maakte het makkelijk om in \u00e9\u00e9n snijbeweging door graanstengels te snijden, sneller dan met een recht mes.'},
+  {type:'mc',category:'denk',q:'Mensen leerden draad spinnen uit wol. Wat konden ze daarmee?',
+    options:['Stof weven voor kleren en dekens','Netten maken om mee te vissen','Touw maken om hutten mee vast te binden','Manden vlechten om eten in te bewaren'],correct:0,
+    explanation:'Van gesponnen woldraad konden ze stof weven. Daar maakten ze warme kleren en dekens van.'},
+  {type:'mc',category:'denk',q:'Waarom was het slim om graan tot meel te malen?',
+    options:['Omdat meel lichter was om te dragen','Omdat meel mooier was om te bekijken','Omdat je van meel brood kon bakken, dat makkelijker te eten en te bewaren is','Omdat dieren geen meel lustten'],correct:2,
+    explanation:'Graankorrels zijn hard en lastig om rauw te eten. Door ze tot meel te malen kon je er brood van bakken dat lekkerder is en langer goed blijft.'},
+  {type:'mc',category:'denk',q:'Wat was een nadeel van het rondtrekken als jager-verzamelaar?',
+    options:['Ze konden geen grote groepen vormen','Je kon geen zware spullen meenemen en had geen vast thuis','Ze konden geen vuur meenemen','Ze vonden steeds dezelfde planten'],correct:1,
+    explanation:'Bij rondtrekken moest je alles zelf dragen. Je kon geen zware of grote spullen bewaren en had geen vaste plek om te wonen.'},
+  {type:'mc',category:'denk',q:'Welk dier was waarschijnlijk als eerste tam gemaakt door de mens?',
+    options:['De geit','De koe','Het paard','De hond'],correct:3,
+    explanation:'De hond (eigenlijk de wolf) was waarschijnlijk het eerste tamme dier. Wolven kwamen bij kampen om etensresten te eten en hielpen later bij de jacht.'},
+  {type:'drag',category:'slepen',q:'Wat hoort bij jagers-verzamelaars en wat bij boeren?',items:['Rondtrekken','Vaste woonplek','Wilde dieren jagen','Graan zaaien','Eten zoeken in de natuur','Tamme dieren houden'],targets:['Jagers-verzamelaars','Jagers-verzamelaars','Jagers-verzamelaars','Boeren','Boeren','Boeren'],acceptGroups:{0:[0,1,2],1:[3,4,5],2:[0,1,2],3:[3,4,5],4:[0,1,2],5:[3,4,5]}},
+  {type:'drag',category:'slepen',q:'Zet deze uitvindingen op volgorde van vroeg naar laat:',items:['Vuur maken','Dieren tam maken','Landbouw','In hutten wonen'],targets:['Eerst','Daarna','Toen','Als laatste'],correctMap:{0:0,1:1,2:2,3:3}},
+  {type:'drag',category:'slepen',q:'Welk gereedschap gebruik je waarvoor?',items:['Maalsteen','Sikkel','Spintol','Vuursteen'],targets:['Graan tot meel malen','Graan afsnijden','Wol tot draad maken','Vuur maken'],correctMap:{0:0,1:1,2:2,3:3}}
+];
+
+var level3Questions=[
+  // TF - mix of true/false
+  {type:'tf',category:'waarniet',q:'Jagers-verzamelaars woonden in hutten op een vaste plek.',correct:false,
+    explanation:'Jagers-verzamelaars trokken juist rond. Pas toen mensen aan landbouw gingen doen, bouwden ze hutten op een vaste plek.'},
+  {type:'tf',category:'waarniet',q:'Vuur werd gebruikt om eten te koken, licht te maken en wilde dieren weg te houden.',correct:true,
+    explanation:'Klopt! Vuur had veel functies: koken, warmte geven, licht in het donker, en het hield wilde dieren op afstand.'},
+  {type:'tf',category:'waarniet',q:'Een sikkel is een rond stuk steen waarmee je graan kon malen.',correct:false,
+    explanation:'Dat klopt niet. Een sikkel is een gebogen mes om graan mee te snijden. Het ronde stuk steen om te malen heet een maalsteen.'},
+  {type:'tf',category:'waarniet',q:'De hond was waarschijnlijk het eerste dier dat tam werd gemaakt.',correct:true,
+    explanation:'Klopt! Wolven kwamen bij de kampen van mensen om etensresten te eten. Langzaam werden ze tam en hielpen ze bij de jacht.'},
+  {type:'tf',category:'waarniet',q:'Mensen gingen rondtrekken omdat ze nieuwe gebieden wilden ontdekken.',correct:false,
+    explanation:'Mensen trokken niet rond uit nieuwsgierigheid, maar uit noodzaak: als het eten op een plek op was, moesten ze verder trekken.'},
+  {type:'tf',category:'waarniet',q:'Van wol kon je met een spintol draad maken om stof van te weven.',correct:true,
+    explanation:'Klopt! Met een spintol draaide je wol tot stevige draad. Van die draad kon je stof weven voor kleren en dekens.'},
+  {type:'tf',category:'waarniet',q:'Landbouw werd eerder ontdekt dan het tam maken van dieren.',correct:false,
+    explanation:'Het was andersom: mensen gingen eerst dieren tam maken. Landbouw \u2014 het zaaien en verbouwen van planten \u2014 kwam pas later.'},
+  {type:'tf',category:'waarniet',q:'Mensen geloofden in natuurgoden omdat ze de natuur niet begrepen.',correct:true,
+    explanation:'Klopt! Mensen wisten niet hoe regen, zon en wind werkten. Ze dachten dat goden deze natuurkrachten bestuurden.'},
+  // Multi-select - plausible distractors only
+  {type:'multi',category:'multi',q:'Waarvoor gebruikten mensen vuur? (meerdere antwoorden)',
+    options:['Eten koken','Warmte geven','Dierenhuiden drogen','Licht maken in het donker','Stenen gereedschap maken','Wilde dieren wegjagen'],correctIndices:[0,1,3,5],
+    explanation:'Vuur werd gebruikt om te koken, warmte te geven, licht te maken in het donker, en om wilde dieren op afstand te houden.'},
+  {type:'multi',category:'multi',q:'Wat leverden tamme dieren op? (meerdere antwoorden)',
+    options:['Melk','Wol','Eieren','Vlees','Honing'],correctIndices:[0,1,3],
+    explanation:'Tamme dieren gaven melk, wol en vlees. Eieren kwamen pas later met het houden van kippen, en honing komt van wilde bijen.'},
+  {type:'multi',category:'multi',q:'Wat hoort bij het leven van jagers-verzamelaars? (meerdere antwoorden)',
+    options:['Rondtrekken naar nieuwe plekken','Wilde dieren jagen','Graan zaaien en oogsten','Bessen en noten zoeken','Tamme dieren melken'],correctIndices:[0,1,3],
+    explanation:'Jagers-verzamelaars trokken rond, jaagden op wilde dieren en zochten eetbare planten. Graan zaaien en dieren melken hoort bij boeren.'},
+  {type:'multi',category:'multi',q:'Welke gereedschappen bestonden al in de prehistorie? (meerdere antwoorden)',
+    options:['Maalsteen','Ploeg met ijzeren blad','Sikkel','Houten kar met wielen','Spintol','Vuursteen'],correctIndices:[0,2,4,5],
+    explanation:'De maalsteen, sikkel, spintol en vuursteen zijn prehistorische gereedschappen. De ijzeren ploeg en houten kar kwamen pas veel later.'},
+  // MC - varied correct: 2, 0
+  {type:'mc',category:'denk',q:'Waarom was de overgang naar landbouw zo\u0027n grote verandering voor de mensen?',
+    options:['Ze konden grotere groepen dieren tam maken','Ze leerden beter samenwerken in de jacht','Ze konden op \u00e9\u00e9n plek blijven, spullen verzamelen en grotere gemeenschappen vormen','Ze ontdekten dat planten sneller groeiden dan verwacht'],correct:2,
+    explanation:'Door landbouw hoefden mensen niet meer rond te trekken. Ze konden op \u00e9\u00e9n plek blijven, bezittingen opbouwen en grotere gemeenschappen vormen. Dat veranderde alles.'},
+  {type:'mc',category:'denk',q:'Waarom was het belangrijk dat mensen kleren leerden maken van wol?',
+    options:['Ze konden zich beschermen tegen kou en in koudere gebieden leven','Ze konden de wol ruilen met andere groepen','Ze wilden er anders uitzien dan andere stammen','Ze gebruikten de kleren als bescherming bij de jacht'],correct:0,
+    explanation:'Warme kleding van wol beschermde tegen de kou. Hierdoor konden mensen ook in koudere gebieden overleven waar dat eerder niet kon.'},
+  // Drag
+  {type:'drag',category:'slepen',q:'Wat hoort bij welk tijdperk?',items:['Rondtrekken','Sikkel gebruiken','Natuurgoden aanbidden','In hutten wonen','Wilde dieren jagen','Graan oogsten'],targets:['Jagers-verzamelaars','Jagers-verzamelaars','Allebei','Boeren','Jagers-verzamelaars','Boeren'],correctMap:{0:0,1:5,2:2,3:3,4:4,5:5}},
+  {type:'drag',category:'slepen',q:'Welk gereedschap hoort bij welke activiteit?',items:['Vuursteen','Maalsteen','Sikkel','Spintol'],targets:['Vuur maken','Brood bakken','Graan oogsten','Kleren maken'],correctMap:{0:0,1:1,2:2,3:3}}
+];
+
+// ===== STATE =====
+var selectedPet=null,selectedLevel=null,currentQ=0,points=0,lives=3,questions=[],answered=[];
+var dragIdx=null,selectedDragItem=null;
+var cleanupTimers=[];
+
+function getPet(){return pets[selectedPet];}
+function getItemEmoji(){return getPet().item;}
+function getItemName(){return getPet().itemName;}
+
+// ===== EVENT DELEGATION (no inline handlers) =====
+// Level cards
+document.querySelectorAll('.level-card').forEach(function(card){
+  function select(){
+    var l=parseInt(card.dataset.level);
+    selectedLevel=l;
+    document.querySelectorAll('.level-card').forEach(function(c){c.setAttribute('aria-pressed','false');});
+    card.setAttribute('aria-pressed','true');
+    checkReady();
+    announce('Level '+l+' geselecteerd');
+  }
+  card.addEventListener('click',select);
+  card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();select();}});
+});
+
+// Pet cards
+document.querySelectorAll('.pet-card').forEach(function(card){
+  function select(){
+    var p=card.dataset.pet;
+    selectedPet=p;
+    document.querySelectorAll('.pet-card').forEach(function(c){c.setAttribute('aria-pressed','false');});
+    card.setAttribute('aria-pressed','true');
+    checkReady();
+    announce(pets[p].name+' geselecteerd');
+  }
+  card.addEventListener('click',select);
+  card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();select();}});
+});
+
+// Start button
+document.getElementById('btn-start').addEventListener('click',startGame);
+
+// Next button
+document.getElementById('btn-next').addEventListener('click',nextQuestion);
+
+function checkReady(){
+  var ready=!!(selectedPet&&selectedLevel);
+  var btn=document.getElementById('btn-start');
+  btn.disabled=!ready;
+  btn.setAttribute('aria-disabled',ready?'false':'true');
+}
+
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var screen=document.getElementById(id);
+  screen.classList.add('active');
+  screen.focus();
+  setStarsPaused(id!=='title-screen');
+}
+
+function getPoints(qType){
+  var base={mc:10,tf:10,multi:15,drag:15};
+  var mult={1:1,2:1.5,3:2};
+  return Math.round((base[qType]||10)*(mult[selectedLevel]||1));
+}
+
+// Cleanup any pending animation timers
+function cleanupAnimations(){
+  cleanupTimers.forEach(function(id){clearTimeout(id);});
+  cleanupTimers=[];
+  document.querySelectorAll('.feedback-float,.item-collect,.confetti-piece').forEach(function(el){el.remove();});
+}
+
+function startGame(){
+  cleanupAnimations();
+  var pools={1:level1Questions,2:level2Questions,3:level3Questions};
+  questions=shuffle(pools[selectedLevel]).slice(0,10);
+  currentQ=0;points=0;lives=3;answered=[];dragIdx=null;selectedDragItem=null;
+  showScreen('game-screen');
+  var gs=document.getElementById('game-screen');
+  gs.classList.remove('level2-bg','level3-bg');
+  if(selectedLevel===2)gs.classList.add('level2-bg');
+  if(selectedLevel===3)gs.classList.add('level3-bg');
+  updateHUD();
+  safeText(document.getElementById('walking-pet'),getPet().emoji);
+  renderQuestion();
+  announce('Het spel begint! Level '+selectedLevel+' met '+getPet().name);
+}
+
+function updateHUD(){
+  var badges={1:'<span class="hud-level-badge l1">Level 1</span>',2:'<span class="hud-level-badge l2">Level 2</span>',3:'<span class="hud-level-badge l3">Level 3</span>'};
+  document.getElementById('hud-bones').innerHTML=badges[selectedLevel]+' '+esc(getItemEmoji()+' '+points);
+  var dots='';
+  for(var i=0;i<questions.length;i++){var cls='';if(i<answered.length)cls=answered[i]?'correct':'wrong';else if(i===currentQ)cls='current';dots+='<div class="progress-dot '+cls+'" aria-label="Vraag '+(i+1)+(cls?' '+cls:'')+'"></div>';}
+  document.getElementById('hud-progress').innerHTML=dots;
+  var hearts='';for(var i=0;i<3;i++)hearts+=i<lives?'❤️':'🖤';
+  document.getElementById('hud-lives').innerHTML=hearts;
+  var pct=(currentQ/questions.length)*85+5;
+  var wp=document.getElementById('walking-pet');wp.style.left=pct+'%';wp.classList.remove('bounce');void wp.offsetWidth;wp.classList.add('bounce');
+}
+
+function renderQuestion(){
+  if(currentQ>=questions.length||lives<=0){showResults();return;}
+  var q=questions[currentQ],pet=getPet(),area=document.getElementById('question-area');
+  document.getElementById('btn-next').style.display='none';
+  dragIdx=null;selectedDragItem=null;
+
+  var labels={kennis:'Kennis',begrip:'Begrip',denk:'Denkvraag',slepen:'Slepen',waarniet:'Waar of niet?',multi:'Meerdere goed'};
+  var typeCls=q.category;
+  var typeLabel=labels[q.category]||'Vraag';
+
+  // Build DOM safely
+  area.innerHTML='';
+
+  // Companion
+  var comp=document.createElement('div');comp.className='companion';
+  var avatar=document.createElement('div');avatar.className='companion-avatar';avatar.textContent=pet.emoji;avatar.setAttribute('aria-hidden','true');
+  var bubble=document.createElement('div');bubble.className='companion-bubble';bubble.id='companion-bubble';
+  bubble.textContent=pet.sound+' Vraag '+(currentQ+1)+' van '+questions.length+'!';
+  comp.appendChild(avatar);comp.appendChild(bubble);area.appendChild(comp);
+
+  var badge=document.createElement('span');badge.className='q-type '+typeCls;badge.textContent=typeLabel;area.appendChild(badge);
+
+  var qText=document.createElement('div');qText.className='question-text';qText.id='q-text';qText.textContent=q.q;area.appendChild(qText);
+
+  if(q.type==='mc') renderMC(area,q);
+  else if(q.type==='tf') renderTF(area,q);
+  else if(q.type==='multi') renderMulti(area,q);
+  else if(q.type==='drag') renderDrag(area,q);
+
+  announce('Vraag '+(currentQ+1)+': '+q.q);
+}
+
+function renderMC(area,q){
+  var div=document.createElement('div');div.className='answers';div.setAttribute('role','group');div.setAttribute('aria-labelledby','q-text');
+  q.options.forEach(function(opt,i){
+    var btn=document.createElement('button');btn.className='answer-btn';btn.textContent=opt;btn.type='button';
+    btn.addEventListener('click',function(){checkMC(btn,i,q.correct);});
+    div.appendChild(btn);
+  });
+  area.appendChild(div);
+}
+
+function renderTF(area,q){
+  var div=document.createElement('div');div.className='tf-buttons';
+  var btnT=document.createElement('button');btnT.className='tf-btn tf-true';btnT.type='button';btnT.textContent='✓ Waar';
+  var btnF=document.createElement('button');btnF.className='tf-btn tf-false';btnF.type='button';btnF.textContent='✗ Niet waar';
+  btnT.addEventListener('click',function(){checkTF(btnT,true,q.correct);});
+  btnF.addEventListener('click',function(){checkTF(btnF,false,q.correct);});
+  div.appendChild(btnT);div.appendChild(btnF);area.appendChild(div);
+}
+
+function renderMulti(area,q){
+  var hint=document.createElement('div');hint.className='multi-hint';hint.textContent='Tip: er zijn '+q.correctIndices.length+' goede antwoorden!';area.appendChild(hint);
+  var div=document.createElement('div');div.className='answers';div.id='multi-answers';div.setAttribute('role','group');div.setAttribute('aria-labelledby','q-text');
+  q.options.forEach(function(opt,i){
+    var btn=document.createElement('button');btn.className='multi-btn';btn.type='button';btn.textContent=opt;
+    btn.dataset.idx=i;btn.setAttribute('aria-checked','false');
+    btn.addEventListener('click',function(){toggleMulti(btn);});
+    div.appendChild(btn);
+  });
+  area.appendChild(div);
+  var check=document.createElement('button');check.className='btn-check';check.type='button';check.textContent='Controleer! ✓';
+  check.addEventListener('click',checkMulti);area.appendChild(check);
+}
+
+function renderDrag(area,q){
+  var shuffled=shuffle(q.items.map(function(item,i){return {text:item,origIdx:i};}));
+  var zone=document.createElement('div');zone.className='drag-zone';zone.id='drag-source';
+  shuffled.forEach(function(item){
+    var d=document.createElement('div');d.className='drag-item';d.setAttribute('draggable','true');d.dataset.idx=item.origIdx;
+    d.setAttribute('tabindex','0');d.setAttribute('role','option');d.setAttribute('aria-label',item.text+' — klik om te selecteren, sleep naar een vakje');
+    d.textContent=item.text;
+    d.addEventListener('click',clickSelectItem);
+    d.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();clickSelectItem(e);}});
+    d.addEventListener('dragstart',dragStart);
+    d.addEventListener('touchstart',touchStart,{passive:false});
+    d.addEventListener('touchmove',touchMoveHandler,{passive:false});
+    d.addEventListener('touchend',touchEnd);
+    zone.appendChild(d);
+  });
+  area.appendChild(zone);
+
+  var targets=document.createElement('div');targets.className='drop-targets';targets.id='drop-targets';
+  q.targets.forEach(function(t,i){
+    var row=document.createElement('div');row.className='drop-row';
+    var label=document.createElement('div');label.className='drop-label';label.textContent=t;
+    var target=document.createElement('div');target.className='drop-target';target.dataset.target=i;
+    target.setAttribute('role','listbox');target.setAttribute('aria-label','Vakje voor: '+t);
+    target.addEventListener('dragover',dragOverHandler);
+    target.addEventListener('dragleave',dragLeaveHandler);
+    target.addEventListener('drop',dropHandler);
+    target.addEventListener('click',function(e){dropClickHandler(e,i);});
+    target.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();dropClickHandler(e,i);}});
+    target.setAttribute('tabindex','0');
+    row.appendChild(label);row.appendChild(target);targets.appendChild(row);
+  });
+  area.appendChild(targets);
+
+  var check=document.createElement('button');check.className='btn-check';check.id='btn-check-drag';check.type='button';check.textContent='Controleer! ✓';
+  check.addEventListener('click',checkDrag);area.appendChild(check);
+}
+
+// ===== MC CHECK =====
+function checkMC(btn,chosen,correct){
+  var area=document.getElementById('question-area'),buttons=area.querySelectorAll('.answer-btn'),q=questions[currentQ];
+  buttons.forEach(function(b){b.classList.add('locked');b.setAttribute('aria-disabled','true');});
+  if(chosen===correct){btn.classList.add('correct-answer');points+=getPoints('mc');answered.push(true);showFeedback(true);}
+  else{btn.classList.add('wrong-answer');buttons[correct].classList.add('reveal-correct');lives--;answered.push(false);showFeedback(false);if(q.explanation)addExplanation(q.explanation);}
+  updateHUD();document.getElementById('btn-next').style.display='inline-block';document.getElementById('btn-next').focus();
+}
+
+// ===== TF CHECK =====
+function checkTF(btn,chosen,correct){
+  var btns=document.querySelectorAll('.tf-btn'),q=questions[currentQ];
+  btns.forEach(function(b){b.classList.add('locked');b.setAttribute('aria-disabled','true');});
+  if(chosen===correct){btn.classList.add('correct-answer');points+=getPoints('tf');answered.push(true);showFeedback(true);}
+  else{btn.classList.add('wrong-answer');Array.from(btns).forEach(function(b){if(b!==btn)b.classList.add('reveal-correct');});lives--;answered.push(false);showFeedback(false);if(q.explanation)addExplanation(q.explanation);}
+  updateHUD();document.getElementById('btn-next').style.display='inline-block';document.getElementById('btn-next').focus();
+}
+
+// ===== MULTI CHECK =====
+function toggleMulti(btn){
+  if(btn.classList.contains('locked'))return;
+  var checked=btn.getAttribute('aria-checked')==='true';
+  btn.setAttribute('aria-checked',checked?'false':'true');
+}
+
+function checkMulti(){
+  var q=questions[currentQ],btns=document.querySelectorAll('.multi-btn');
+  var chosen=new Set();
+  btns.forEach(function(b){if(b.getAttribute('aria-checked')==='true')chosen.add(parseInt(b.dataset.idx));});
+  if(chosen.size===0)return;
+  var correctSet=new Set(q.correctIndices);
+  var allCorrect=true;
+  btns.forEach(function(b){
+    b.classList.add('locked');b.setAttribute('aria-disabled','true');
+    var idx=parseInt(b.dataset.idx),isC=correctSet.has(idx),wasC=chosen.has(idx);
+    if(wasC&&isC)b.classList.add('correct-answer');
+    else if(wasC&&!isC){b.classList.add('wrong-answer');allCorrect=false;}
+    else if(!wasC&&isC){b.classList.add('missed-correct');allCorrect=false;}
+  });
+  var cb=document.querySelector('.btn-check');if(cb)cb.style.display='none';
+  if(allCorrect){points+=getPoints('multi');answered.push(true);showFeedback(true);}
+  else{lives--;answered.push(false);showFeedback(false);if(q.explanation)addExplanation(q.explanation);}
+  updateHUD();document.getElementById('btn-next').style.display='inline-block';document.getElementById('btn-next').focus();
+}
+
+function addExplanation(text){
+  var area=document.getElementById('question-area'),div=document.createElement('div');
+  div.className='explanation';
+  var strong=document.createElement('strong');strong.textContent='💡 Uitleg: ';
+  div.appendChild(strong);div.appendChild(document.createTextNode(text));
+  area.appendChild(div);
+}
+
+// ===== DRAG & DROP =====
+function clickSelectItem(e){
+  var item=e.target.closest('.drag-item');if(!item||item.classList.contains('placed'))return;
+  document.querySelectorAll('.drag-item.selected-item').forEach(function(el){el.classList.remove('selected-item');});
+  selectedDragItem=item;dragIdx=item.dataset.idx;item.classList.add('selected-item');
+  announce(item.textContent+' geselecteerd. Klik op een vakje om te plaatsen.');
+}
+function dragStart(e){dragIdx=e.target.dataset.idx;e.dataTransfer.effectAllowed='move';}
+function dragOverHandler(e){e.preventDefault();e.currentTarget.classList.add('hover');}
+function dragLeaveHandler(e){e.currentTarget.classList.remove('hover');}
+function dropHandler(e){e.preventDefault();e.currentTarget.classList.remove('hover');var source=document.querySelector('#drag-source .drag-item[data-idx="'+dragIdx+'"]');if(source)placeItemInTarget(source,e.currentTarget);}
+
+function touchStart(e){
+  var item=e.target.closest('.drag-item');if(!item||item.classList.contains('placed'))return;
+  document.querySelectorAll('.drag-item.selected-item').forEach(function(el){el.classList.remove('selected-item');});
+  selectedDragItem=item;dragIdx=item.dataset.idx;item.classList.add('selected-item');item.style.opacity='0.5';
+}
+function touchMoveHandler(e){e.preventDefault();}
+function touchEnd(e){
+  var source=e.target.closest('.drag-item');if(source)source.style.opacity='';
+  var touch=e.changedTouches[0],targets=document.querySelectorAll('.drop-target');
+  var best=null,bestD=Infinity;
+  targets.forEach(function(t){var r=t.getBoundingClientRect(),d=Math.hypot(touch.clientX-(r.left+r.width/2),touch.clientY-(r.top+r.height/2));if(d<bestD&&d<100){bestD=d;best=t;}});
+  if(best&&selectedDragItem)placeItemInTarget(selectedDragItem,best);
+}
+function dropClickHandler(e,i){
+  var t=e.currentTarget;if(!selectedDragItem||selectedDragItem.classList.contains('placed'))return;
+  placeItemInTarget(selectedDragItem,t);
+}
+
+function placeItemInTarget(src,target){
+  var idx=src.dataset.idx;
+  if(target.children.length>0){var ex=target.children[0],ei=ex.dataset.idx,es=document.querySelector('#drag-source .drag-item[data-idx="'+ei+'"]');if(es){es.classList.remove('placed','selected-item');}target.removeChild(ex);}
+  var ep=document.querySelector('.drop-target .drag-item[data-idx="'+idx+'"]');if(ep)ep.parentElement.removeChild(ep);
+  src.classList.add('placed');src.classList.remove('selected-item');src.style.opacity='';
+  var clone=src.cloneNode(true);clone.classList.remove('placed','selected-item');clone.setAttribute('draggable','false');clone.removeAttribute('tabindex');
+  var ref=src;clone.addEventListener('click',function(){returnItem(clone,ref);});
+  clone.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();returnItem(clone,ref);}});
+  target.appendChild(clone);selectedDragItem=null;dragIdx=null;
+  announce(src.textContent+' geplaatst');
+}
+function returnItem(clone,source){source.classList.remove('placed','selected-item');clone.parentElement.removeChild(clone);}
+
+function checkDrag(){
+  var q=questions[currentQ],targets=document.querySelectorAll('.drop-target'),allCorrect=true,allFilled=true;
+  targets.forEach(function(t){if(t.children.length===0)allFilled=false;});if(!allFilled){announce('Vul eerst alle vakjes in');return;}
+  targets.forEach(function(t){
+    var iIdx=parseInt(t.children[0].dataset.idx),tIdx=parseInt(t.dataset.target),ok=false;
+    if(q.acceptGroups){var a=q.acceptGroups[iIdx];ok=a&&a.indexOf(tIdx)>=0;}else{ok=(q.correctMap[iIdx]===tIdx);}
+    t.classList.add(ok?'correct-drop':'wrong-drop');if(!ok)allCorrect=false;
+  });
+  document.querySelectorAll('#drag-source .drag-item').forEach(function(d){d.style.pointerEvents='none';d.classList.remove('selected-item');});
+  document.querySelectorAll('.drop-target .drag-item').forEach(function(d){d.style.pointerEvents='none';});
+  var cb=document.getElementById('btn-check-drag');if(cb)cb.style.display='none';
+  if(allCorrect){points+=getPoints('drag');answered.push(true);showFeedback(true);}else{lives--;answered.push(false);showFeedback(false);}
+  updateHUD();document.getElementById('btn-next').style.display='inline-block';document.getElementById('btn-next').focus();
+}
+
+// ===== FEEDBACK =====
+function showFeedback(correct){
+  var pet=getPet(),pool=correct?pet.encourageGood:pet.encourageBad;
+  var msg=pool[Math.floor(Math.random()*pool.length)];
+  var el=document.createElement('div');el.className='feedback-float '+(correct?'good':'bad');
+  el.setAttribute('aria-hidden','true');
+  safeText(el,(correct?'✨ ':'💫 ')+msg);
+  document.body.appendChild(el);
+  var t1=setTimeout(function(){el.remove();},1300);cleanupTimers.push(t1);
+
+  if(correct){
+    var q=questions[currentQ],pts=getPoints(q.type);
+    var b=document.createElement('div');b.className='item-collect';b.setAttribute('aria-hidden','true');
+    b.textContent=getItemEmoji()+' +'+pts;b.style.left='50%';b.style.top='40%';
+    document.body.appendChild(b);
+    var t2=setTimeout(function(){b.remove();},1000);cleanupTimers.push(t2);
+  }
+
+  var bubble=document.getElementById('companion-bubble');
+  if(bubble)safeText(bubble,msg);
+  announce(correct?'Goed! '+msg:'Fout. '+msg);
+}
+
+function nextQuestion(){currentQ++;updateHUD();renderQuestion();}
+
+// ===== RESULTS =====
+function showResults(){
+  cleanupAnimations();
+  showScreen('result-screen');
+  var pet=getPet(),correctCount=answered.filter(function(a){return a;}).length,total=answered.length;
+  var pct=total>0?correctCount/total:0;
+  var starCount=pct>=0.9?3:pct>=0.6?2:pct>=0.3?1:0;
+  var starsHtml='';for(var i=0;i<3;i++)starsHtml+=i<starCount?'⭐':'<span class="star-empty" aria-hidden="true">⭐</span>';
+  var levelTexts={1:'Level 1',2:'Level 2',3:'Level 3'};var levelText=levelTexts[selectedLevel];
+
+  var title,petMsg;
+  if(selectedLevel===3){
+    if(pct>=0.9){title='Legendarisch! 👑🏆';petMsg=pet.name+' is sprakeloos! Level 3 gehaald \u2014 je bent een ware prehistorie-legende!';}
+    else if(pct>=0.6){title='Heel knap! 💪🏆';petMsg=pet.name+' is mega trots! Level 3 is supermoeilijk en je doet het geweldig!';}
+    else if(pct>=0.3){title='Goed geprobeerd! 📖';petMsg=pet.name+' zegt: Level 3 is echt voor experts! Oefen nog wat met Level 2.';}
+    else{title='Niet opgeven! 💡';petMsg=pet.name+' zegt: Level 3 is het moeilijkste level! Begin met Level 1 of 2.';}
+  }else if(selectedLevel===2){
+    if(pct>=0.9){title='Ongelooflijk! 🏆🔥';petMsg=pet.name+' kan het niet geloven! Probeer nu Level 3!';}
+    else if(pct>=0.6){title='Knap gedaan! 💪🔥';petMsg=pet.name+' is onder de indruk!';}
+    else if(pct>=0.3){title='Goed geprobeerd! 📖';petMsg=pet.name+' zegt: lees de uitleg goed door!';}
+    else{title='Niet opgeven! 💡';petMsg=pet.name+' zegt: probeer eerst Level 1!';}
+  }else{
+    if(pct>=0.9){title='Fantastisch! 🏆';petMsg=pet.name+' is super trots! Probeer nu Level 2!';}
+    else if(pct>=0.6){title='Goed gedaan! 💪';petMsg=pet.name+' vindt dat je het goed doet!';}
+    else if(pct>=0.3){title='Goed geprobeerd! 📖';petMsg=pet.name+' zegt: lees de tekst nog een keer door!';}
+    else{title='Oefening baart kunst! 💡';petMsg=pet.name+' zegt: geen zorgen! Probeer het opnieuw!';}
+  }
+
+  // Build result card safely with DOM
+  var card=document.getElementById('result-card');card.innerHTML='';
+
+  var h2=document.createElement('h2');h2.className='result-title';h2.textContent=title;card.appendChild(h2);
+  var sd=document.createElement('div');sd.className='result-stars';sd.setAttribute('aria-label',starCount+' van 3 sterren');sd.innerHTML=starsHtml;card.appendChild(sd);
+  var sc=document.createElement('div');sc.className='result-score';sc.textContent=levelText+' \u2014 '+correctCount+' van '+total+' vragen goed';card.appendChild(sc);
+  var it=document.createElement('div');it.className='result-items';it.textContent=getItemEmoji()+' '+points+' '+getItemName()+' verzameld';card.appendChild(it);
+
+  var pm=document.createElement('div');pm.className='result-pet-msg';
+  var face=document.createElement('span');face.className='pet-face';face.setAttribute('aria-hidden','true');face.textContent=pet.emoji;
+  var pmText=document.createElement('span');pmText.textContent=petMsg;
+  pm.appendChild(face);pm.appendChild(pmText);card.appendChild(pm);
+
+  var btns=document.createElement('div');btns.className='result-buttons';
+  var replay=document.createElement('button');replay.className='btn-restart';replay.textContent='Opnieuw spelen 🔄';replay.addEventListener('click',function(){startGame();});btns.appendChild(replay);
+  if(selectedLevel<3){var nxt=document.createElement('button');nxt.className='btn-other-level';nxt.textContent='Level '+(selectedLevel+1)+' proberen';var nl=selectedLevel+1;nxt.addEventListener('click',function(){selectedLevel=nl;startGame();});btns.appendChild(nxt);}
+  if(selectedLevel>1){var prv=document.createElement('button');prv.className='btn-other-level';prv.textContent='Level '+(selectedLevel-1)+' spelen';var pl=selectedLevel-1;prv.addEventListener('click',function(){selectedLevel=pl;startGame();});btns.appendChild(prv);}
+  var back=document.createElement('button');back.className='btn-other-level';back.textContent='\u2190 Terug naar start';back.addEventListener('click',function(){showScreen('title-screen');});btns.appendChild(back);
+  card.appendChild(btns);
+
+  announce(title+' '+correctCount+' van '+total+' goed. '+points+' '+getItemName()+' verzameld.');
+  if(starCount>=2)launchConfetti();
+}
+
+function launchConfetti(){
+  var colors=['#ff6b2b','#ffd93d','#4caf50','#2196f3','#e91e63','#9c27b0'];
+  for(var i=0;i<50;i++){
+    var c=document.createElement('div');c.className='confetti-piece';c.setAttribute('aria-hidden','true');
+    c.style.cssText='left:'+Math.random()*100+'%;top:-10px;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(Math.random()>0.5?'50%':'2px')+';width:'+(6+Math.random()*8)+'px;height:'+(6+Math.random()*8)+'px;animation-duration:'+(2+Math.random()*2)+'s;animation-delay:'+Math.random()*0.5+'s;';
+    document.body.appendChild(c);
+    var t=setTimeout(function(el){return function(){el.remove();};}(c),4500);
+    cleanupTimers.push(t);
+  }
+}
+
+// ===== SERVICE WORKER (cache-first for offline) =====
+if('serviceWorker' in navigator){
+  // Note: Blob-based SW works in Chromium but NOT Safari.
+  // For full cross-browser PWA, deploy sw.js as a separate file.
+  try{
+    var swCode='var CACHE="prehistorie-v1";'
+      +'self.addEventListener("install",function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll([self.location.href]);}));self.skipWaiting();});'
+      +'self.addEventListener("activate",function(e){e.waitUntil(self.clients.claim());});'
+      +'self.addEventListener("fetch",function(e){e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request).then(function(resp){return caches.open(CACHE).then(function(c){c.put(e.request,resp.clone());return resp;});});}));});';
+    var blob=new Blob([swCode],{type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
+  }catch(e){}
+}
+</script>
+</body>
+</html>
